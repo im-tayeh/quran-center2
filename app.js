@@ -96,7 +96,7 @@ function switchToDataMode() {
     statusPillEl.textContent = "لا يوجد تحميل حالياً";
 
     searchInputEl.value = "";
-    searchInputEl.placeholder = "بحث باسم الطالب أو الحلقة...";
+    searchInputEl.placeholder = "بحث...";
 }
 
 function switchToReportsMode() {

@@ -115,12 +115,29 @@ function setLoadingState(isLoading, text) {
 }
 
 function setErrorState(message) {
+    // إخفاء شاشة التحميل
     loadingOverlayEl.classList.add("hidden");
     statusPillEl.classList.remove("ok");
     statusPillEl.textContent = "حدث خطأ في التحميل";
-    tableHeaderRowEl.innerHTML = "";
-    tableBodyEl.innerHTML = `<tr><td colspan="10" class="error-msg">${message}</td></tr>`;
+
+    if (currentMode === "reports") {
+        // في وضع التقارير: أظهر رسالة الخطأ داخل قائمة التقارير
+        reportsViewEl.innerHTML = `
+            <div class="error-msg" style="padding: 10px 4px;">
+                ${message}
+            </div>
+        `;
+    } else {
+        // في وضع البيانات: أظهر الخطأ داخل الجدول كما كان سابقًا
+        tableHeaderRowEl.innerHTML = "";
+        tableBodyEl.innerHTML = `
+            <tr>
+                <td colspan="10" class="error-msg">${message}</td>
+            </tr>
+        `;
+    }
 }
+
 
 function buildCsvUrl(sheetName) {
     const cacheBuster = Date.now();

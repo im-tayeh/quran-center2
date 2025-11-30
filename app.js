@@ -14,11 +14,22 @@ const COLUMN_RANGES = {
     teachers: { start: 0, end: 11 }
 };
 
+const GITHUB_OWNER = "im-tayeh";
+const GITHUB_REPO = "quran-center2";
+
+const REPORTS_FOLDERS = {
+    primary: "primary",
+    prep: "prep",
+    secondary: "secondary",
+    teachers: "teachers"
+};
+
 const splashEl = document.getElementById("splash");
 const mainEl = document.getElementById("main");
 const startBtn = document.getElementById("startBtn");
 const backToSplashBtn = document.getElementById("backToSplashBtn");
 const studentsMainBtn = document.getElementById("studentsMainBtn");
+const reportsMainBtn = document.getElementById("reportsMainBtn");
 const levelButtons = document.querySelectorAll(".level-btn");
 const tableTitleEl = document.getElementById("tableTitle");
 const tableSubtitleEl = document.getElementById("tableSubtitle");
@@ -28,9 +39,15 @@ const loadingOverlayEl = document.getElementById("loadingOverlay");
 const reloadBtn = document.getElementById("reloadBtn");
 const statusPillEl = document.getElementById("statusPill");
 const searchInputEl = document.getElementById("searchInput");
+const mainModeTitleEl = document.getElementById("mainModeTitle");
+const levelSectionTitleEl = document.getElementById("levelSectionTitle");
+const dataViewEl = document.getElementById("dataView");
+const reportsViewEl = document.getElementById("reportsView");
 
 let currentLevelKey = null;
 let currentAllRows = null;
+let currentMode = "data";
+let currentReports = [];
 
 function showSplash() {
     splashEl.classList.remove("hidden");
@@ -42,7 +59,14 @@ function showMain() {
     mainEl.classList.remove("hidden");
 }
 
-function resetToMainState() {
+function switchToDataMode() {
+    currentMode = "data";
+    studentsMainBtn.classList.add("active");
+    reportsMainBtn.classList.remove("active");
+    mainModeTitleEl.textContent = "القائمة الرئيسية";
+    levelSectionTitleEl.textContent = "اختر المرحلة الدراسية أو قسم المحفظين لعرض بياناته";
+    dataViewEl.classList.remove("hidden");
+    reportsViewEl.classList.add("hidden");
     currentLevelKey = null;
     currentAllRows = null;
     tableHeaderRowEl.innerHTML = "";
@@ -53,6 +77,29 @@ function resetToMainState() {
     statusPillEl.classList.remove("ok");
     statusPillEl.textContent = "لا يوجد تحميل حالياً";
     searchInputEl.value = "";
+    searchInputEl.placeholder = "بحث باسم الطالب أو الحلقة...";
+}
+
+function switchToReportsMode() {
+    currentMode = "reports";
+    studentsMainBtn.classList.remove("active");
+    reportsMainBtn.classList.add("active");
+    mainModeTitleEl.textContent = "التقارير الشهرية";
+    levelSectionTitleEl.textContent = "اختر المرحلة الدراسية أو قسم المحفظين لعرض تقاريره";
+    dataViewEl.classList.add("hidden");
+    reportsViewEl.classList.remove("hidden");
+    currentLevelKey = null;
+    currentReports = [];
+    reportsViewEl.innerHTML = "";
+    tableHeaderRowEl.innerHTML = "";
+    tableBodyEl.innerHTML = "";
+    tableTitleEl.textContent = "اختر مرحلة من الأعلى لعرض تقاريره";
+    tableSubtitleEl.textContent = "سيتم عرض جميع ملفات التقارير (PDF) للمرحلة المختارة.";
+    levelButtons.forEach(btn => btn.classList.remove("active"));
+    statusPillEl.classList.remove("ok");
+    statusPillEl.textContent = "لا يوجد تحميل حالياً";
+    searchInputEl.value = "";
+    searchInputEl.placeholder = "بحث باسم التقرير...";
 }
 
 function setLoadingState(isLoading, text) {
@@ -196,6 +243,73 @@ function renderTable(rows, filterTerm = "") {
     }
 }
 
+function renderReports(reports, filterTerm = "") {
+    reportsViewEl.innerHTML = "";
+
+    const normalizedFilter = (filterTerm || "").trim().toLowerCase();
+
+    const filtered = normalizedFilter
+        ? reports.filter(r => r.name.toLowerCase().includes(normalizedFilter))
+        : reports;
+
+    if (!filtered.length) {
+        const div = document.createElement("div");
+        div.className = "muted-text";
+        div.style.padding = "10px 4px";
+        div.textContent = normalizedFilter
+            ? "لا توجد تقارير مطابقة لبحثك."
+            : "لا توجد تقارير مضافة لهذه المرحلة حالياً.";
+        reportsViewEl.appendChild(div);
+        tableSubtitleEl.textContent = normalizedFilter
+            ? `لا توجد تقارير مطابقة لبحثك (إجمالي الملفات: ${reports.length})`
+            : "لا توجد تقارير مضافة لهذه المرحلة حالياً.";
+        return;
+    }
+
+    filtered
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name, "ar"))
+        .forEach(report => {
+            const a = document.createElement("a");
+            a.href = report.url;
+            a.download = report.name;
+            a.className = "report-item";
+            a.target = "_blank";
+
+            const left = document.createElement("div");
+            left.className = "report-item-left";
+
+            const iconSpan = document.createElement("span");
+            iconSpan.textContent = "📄";
+
+            const textWrapper = document.createElement("div");
+            const nameSpan = document.createElement("div");
+            nameSpan.className = "report-name";
+            nameSpan.textContent = report.name;
+
+            const metaSpan = document.createElement("div");
+            metaSpan.className = "report-meta";
+            metaSpan.textContent = "ملف PDF - اضغط للتحميل";
+
+            textWrapper.appendChild(nameSpan);
+            textWrapper.appendChild(metaSpan);
+
+            left.appendChild(iconSpan);
+            left.appendChild(textWrapper);
+
+            const downloadSpan = document.createElement("span");
+            downloadSpan.className = "report-download-btn";
+            downloadSpan.textContent = "تحميل";
+
+            a.appendChild(left);
+            a.appendChild(downloadSpan);
+
+            reportsViewEl.appendChild(a);
+        });
+
+    tableSubtitleEl.textContent = `إجمالي التقارير: ${filtered.length} من ${reports.length}`;
+}
+
 async function loadLevel(levelKey) {
     const config = SHEETS_CONFIG[levelKey];
     if (!config || !config.sheetName || !SPREADSHEET_ID) {
@@ -237,30 +351,104 @@ async function loadLevel(levelKey) {
     }
 }
 
-startBtn.addEventListener("click", showMain);
+async function loadReports(levelKey) {
+    const config = SHEETS_CONFIG[levelKey];
+    const folder = REPORTS_FOLDERS[levelKey];
+
+    if (!config || !folder) {
+        setErrorState("لا يوجد مجلد تقارير مضبوط لهذه المرحلة.");
+        return;
+    }
+
+    currentLevelKey = levelKey;
+    currentReports = [];
+    searchInputEl.value = "";
+
+    tableTitleEl.textContent = `تقارير ${config.title}`;
+    tableSubtitleEl.textContent = "جاري تحميل التقارير من المستودع...";
+
+    levelButtons.forEach(btn => {
+        if (btn.dataset.level === levelKey) btn.classList.add("active");
+        else btn.classList.remove("active");
+    });
+
+    setLoadingState(true, "جاري تحميل تقارير " + config.title + "...");
+
+    try {
+        const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/reports/${folder}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error("تعذر الوصول إلى مجلد التقارير في GitHub.");
+        }
+
+        const items = await response.json();
+
+        const pdfFiles = items.filter(
+            item => item.type === "file" && item.name.toLowerCase().endsWith(".pdf")
+        );
+
+        currentReports = pdfFiles.map(file => ({
+            name: file.name,
+            url: file.download_url || file.html_url
+        }));
+
+        renderReports(currentReports);
+        setLoadingState(false, "تم تحميل التقارير");
+    } catch (err) {
+        console.error(err);
+        setErrorState("تعذر تحميل التقارير: " + err.message);
+    }
+}
+
+startBtn.addEventListener("click", () => {
+    showMain();
+    switchToDataMode();
+});
 
 backToSplashBtn.addEventListener("click", showSplash);
 
 studentsMainBtn.addEventListener("click", () => {
     showMain();
-    resetToMainState();
+    switchToDataMode();
+});
+
+reportsMainBtn.addEventListener("click", () => {
+    showMain();
+    switchToReportsMode();
 });
 
 levelButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-        loadLevel(btn.dataset.level);
+        if (currentMode === "data") {
+            loadLevel(btn.dataset.level);
+        } else {
+            loadReports(btn.dataset.level);
+        }
     });
 });
 
 reloadBtn.addEventListener("click", () => {
-    if (currentLevelKey) {
+    if (!currentLevelKey) {
+        tableSubtitleEl.textContent =
+            currentMode === "data"
+                ? "اختر مرحلة أولاً ثم اضغط تحديث."
+                : "اختر مرحلة أولاً ثم اضغط تحديث التقارير.";
+        return;
+    }
+
+    if (currentMode === "data") {
         loadLevel(currentLevelKey);
     } else {
-        tableSubtitleEl.textContent = "اختر مرحلة أولاً ثم اضغط تحديث.";
+        loadReports(currentLevelKey);
     }
 });
 
 searchInputEl.addEventListener("input", () => {
-    if (!currentAllRows) return;
-    renderTable(currentAllRows, searchInputEl.value);
+    if (currentMode === "data") {
+        if (!currentAllRows) return;
+        renderTable(currentAllRows, searchInputEl.value);
+    } else if (currentMode === "reports") {
+        renderReports(currentReports, searchInputEl.value);
+    }
 });

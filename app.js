@@ -102,16 +102,18 @@ function switchToDataMode() {
 function switchToReportsMode() {
     currentMode = "reports";
 
+    // تأكد من إخفاء أي بيانات موجودة (من وضع البيانات) قبل التبديل
+    if (dataViewEl && !dataViewEl.classList.contains("hidden")) {
+        dataViewEl.classList.add("hidden"); // إخفاء جدول بيانات الطلاب والمحفظين
+    }
+
     studentsMainBtn.classList.remove("active");
     reportsMainBtn.classList.add("active");
 
     mainModeTitleEl.textContent = "التقارير الشهرية";
     levelSectionTitleEl.textContent = "اختر المرحلة الدراسية أو قسم المحفظين لعرض تقاريره";
 
-    // تأكد من إخفاء جدول بيانات الطلاب والمحفظين قبل التبديل
-    dataViewEl.classList.add("hidden");
     reportsViewEl.classList.remove("hidden");
-
     currentLevelKey = null;
     currentReports = [];
     reportsViewEl.innerHTML = `
@@ -134,8 +136,6 @@ function switchToReportsMode() {
     searchInputEl.placeholder = "بحث باسم التقرير...";
 }
 
-
-// ================== حالة التحميل والأخطاء ==================
 
 function setLoadingState(isLoading, text) {
     if (isLoading) {

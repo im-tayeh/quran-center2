@@ -1,3 +1,5 @@
+// ================== الإعدادات العامة ==================
+
 const SPREADSHEET_ID = "14bW4VEbCGTOq55aYXiti6xZUPRkwMax7iC7NiynOjb4";
 
 const SHEETS_CONFIG = {
@@ -24,6 +26,8 @@ const REPORTS_FOLDERS = {
     teachers: "teachers"
 };
 
+// ================== عناصر الـ DOM ==================
+
 const splashEl = document.getElementById("splash");
 const mainEl = document.getElementById("main");
 const startBtn = document.getElementById("startBtn");
@@ -49,6 +53,8 @@ let currentAllRows = null;
 let currentMode = "data";
 let currentReports = [];
 
+// ================== دوال العرض الأساسية ==================
+
 function showSplash() {
     splashEl.classList.remove("hidden");
     mainEl.classList.add("hidden");
@@ -61,46 +67,74 @@ function showMain() {
 
 function switchToDataMode() {
     currentMode = "data";
+
     studentsMainBtn.classList.add("active");
     reportsMainBtn.classList.remove("active");
+
     mainModeTitleEl.textContent = "القائمة الرئيسية";
     levelSectionTitleEl.textContent = "اختر المرحلة الدراسية أو قسم المحفظين لعرض بياناته";
+
     dataViewEl.classList.remove("hidden");
     reportsViewEl.classList.add("hidden");
+
     currentLevelKey = null;
     currentAllRows = null;
+
     tableHeaderRowEl.innerHTML = "";
-    tableBodyEl.innerHTML = `<tr><td colspan="10" class="muted-text">لم يتم اختيار مرحلة بعد.</td></tr>`;
+    tableBodyEl.innerHTML = `
+        <tr>
+            <td colspan="10" class="muted-text">
+                لم يتم اختيار مرحلة بعد.
+            </td>
+        </tr>
+    `;
+
     tableTitleEl.textContent = "اختر مرحلة من الأعلى لعرض بيانات الطلاب أو المحفظين";
     tableSubtitleEl.textContent = "لا يتم حفظ أي بيانات في هذه الصفحة، فقط قراءة مباشرة من Google Sheets.";
+
     levelButtons.forEach(btn => btn.classList.remove("active"));
     statusPillEl.classList.remove("ok");
     statusPillEl.textContent = "لا يوجد تحميل حالياً";
+
     searchInputEl.value = "";
     searchInputEl.placeholder = "بحث باسم الطالب أو الحلقة...";
 }
 
 function switchToReportsMode() {
     currentMode = "reports";
+
     studentsMainBtn.classList.remove("active");
     reportsMainBtn.classList.add("active");
+
     mainModeTitleEl.textContent = "التقارير الشهرية";
     levelSectionTitleEl.textContent = "اختر المرحلة الدراسية أو قسم المحفظين لعرض تقاريره";
+
     dataViewEl.classList.add("hidden");
     reportsViewEl.classList.remove("hidden");
+
     currentLevelKey = null;
     currentReports = [];
-    reportsViewEl.innerHTML = "";
+    reportsViewEl.innerHTML = `
+        <div class="muted-text" style="padding:10px 4px;">
+            اختر المرحلة من الأعلى لعرض تقاريرها.
+        </div>
+    `;
+
     tableHeaderRowEl.innerHTML = "";
     tableBodyEl.innerHTML = "";
+
     tableTitleEl.textContent = "اختر مرحلة من الأعلى لعرض تقاريره";
     tableSubtitleEl.textContent = "سيتم عرض جميع ملفات التقارير (PDF) للمرحلة المختارة.";
+
     levelButtons.forEach(btn => btn.classList.remove("active"));
     statusPillEl.classList.remove("ok");
     statusPillEl.textContent = "لا يوجد تحميل حالياً";
+
     searchInputEl.value = "";
     searchInputEl.placeholder = "بحث باسم التقرير...";
 }
+
+// ================== حالة التحميل والأخطاء ==================
 
 function setLoadingState(isLoading, text) {
     if (isLoading) {
@@ -114,30 +148,33 @@ function setLoadingState(isLoading, text) {
     }
 }
 
+// مهم: هذه النسخة تتعامل مع وضع البيانات ووضع التقارير
 function setErrorState(message) {
-    // إخفاء شاشة التحميل
     loadingOverlayEl.classList.add("hidden");
     statusPillEl.classList.remove("ok");
     statusPillEl.textContent = "حدث خطأ في التحميل";
 
     if (currentMode === "reports") {
-        // في وضع التقارير: أظهر رسالة الخطأ داخل قائمة التقارير
+        // الخطأ في وضع التقارير → أظهره داخل قائمة التقارير
         reportsViewEl.innerHTML = `
-            <div class="error-msg" style="padding: 10px 4px;">
+            <div class="error-msg" style="padding:10px 4px;">
                 ${message}
             </div>
         `;
     } else {
-        // في وضع البيانات: أظهر الخطأ داخل الجدول كما كان سابقًا
+        // الخطأ في وضع البيانات → أظهره داخل الجدول
         tableHeaderRowEl.innerHTML = "";
         tableBodyEl.innerHTML = `
             <tr>
-                <td colspan="10" class="error-msg">${message}</td>
+                <td colspan="10" class="error-msg">
+                    ${message}
+                </td>
             </tr>
         `;
     }
 }
 
+// ================== أدوات مساعدة ==================
 
 function buildCsvUrl(sheetName) {
     const cacheBuster = Date.now();
@@ -202,10 +239,18 @@ function normalizeCell(value) {
     return String(value);
 }
 
+// ================== عرض جدول الطلاب / المحفظين ==================
+
 function renderTable(rows, filterTerm = "") {
     if (!rows || rows.length === 0) {
         tableHeaderRowEl.innerHTML = "";
-        tableBodyEl.innerHTML = `<tr><td colspan="10" class="muted-text">لا توجد بيانات للعرض.</td></tr>`;
+        tableBodyEl.innerHTML = `
+            <tr>
+                <td colspan="10" class="muted-text">
+                    لا توجد بيانات للعرض.
+                </td>
+            </tr>
+        `;
         return;
     }
 
@@ -224,7 +269,13 @@ function renderTable(rows, filterTerm = "") {
     tableBodyEl.innerHTML = "";
 
     if (dataRows.length === 0) {
-        tableBodyEl.innerHTML = `<tr><td colspan="${columnIndexes.length}" class="muted-text">لا توجد سجلات بعد.</td></tr>`;
+        tableBodyEl.innerHTML = `
+            <tr>
+                <td colspan="${columnIndexes.length}" class="muted-text">
+                    لا توجد سجلات بعد.
+                </td>
+            </tr>
+        `;
         tableSubtitleEl.textContent = "لا توجد سجلات لهذه المرحلة حالياً.";
         return;
     }
@@ -240,7 +291,13 @@ function renderTable(rows, filterTerm = "") {
         : dataRows;
 
     if (filteredRows.length === 0) {
-        tableBodyEl.innerHTML = `<tr><td colspan="${columnIndexes.length}" class="muted-text">لا توجد سجلات مطابقة لبحثك.</td></tr>`;
+        tableBodyEl.innerHTML = `
+            <tr>
+                <td colspan="${columnIndexes.length}" class="muted-text">
+                    لا توجد سجلات مطابقة لبحثك.
+                </td>
+            </tr>
+        `;
     } else {
         filteredRows.forEach(row => {
             const tr = document.createElement("tr");
@@ -259,6 +316,8 @@ function renderTable(rows, filterTerm = "") {
         tableSubtitleEl.textContent = `إجمالي السجلات: ${dataRows.length}`;
     }
 }
+
+// ================== عرض التقارير ==================
 
 function renderReports(reports, filterTerm = "") {
     reportsViewEl.innerHTML = "";
@@ -327,6 +386,8 @@ function renderReports(reports, filterTerm = "") {
     tableSubtitleEl.textContent = `إجمالي التقارير: ${filtered.length} من ${reports.length}`;
 }
 
+// ================== تحميل البيانات من Google Sheets ==================
+
 async function loadLevel(levelKey) {
     const config = SHEETS_CONFIG[levelKey];
     if (!config || !config.sheetName || !SPREADSHEET_ID) {
@@ -367,6 +428,8 @@ async function loadLevel(levelKey) {
         setErrorState("تعذر تحميل البيانات: " + err.message);
     }
 }
+
+// ================== تحميل التقارير من GitHub ==================
 
 async function loadReports(levelKey) {
     const config = SHEETS_CONFIG[levelKey];
@@ -418,23 +481,43 @@ async function loadReports(levelKey) {
     }
 }
 
-startBtn.addEventListener("click", () => {
-    showMain();
-    switchToDataMode();
-});
+// ================== ربط الأحداث ==================
 
-backToSplashBtn.addEventListener("click", showSplash);
+// مهم: تأكد أن العناصر موجودة فعلاً
+if (!startBtn || !studentsMainBtn || !reportsMainBtn) {
+    console.error("تأكد من أن أزرار startBtn / studentsMainBtn / reportsMainBtn لها نفس الـ id في HTML.");
+}
 
-studentsMainBtn.addEventListener("click", () => {
-    showMain();
-    switchToDataMode();
-});
+// بدء من الشاشة الافتتاحية
+if (startBtn) {
+    startBtn.addEventListener("click", () => {
+        showMain();
+        switchToDataMode();
+    });
+}
 
-reportsMainBtn.addEventListener("click", () => {
-    showMain();
-    switchToReportsMode();
-});
+// رجوع للشاشة الافتتاحية
+if (backToSplashBtn) {
+    backToSplashBtn.addEventListener("click", showSplash);
+}
 
+// التبويب: بيانات الطلاب
+if (studentsMainBtn) {
+    studentsMainBtn.addEventListener("click", () => {
+        showMain();
+        switchToDataMode();
+    });
+}
+
+// التبويب: التقارير
+if (reportsMainBtn) {
+    reportsMainBtn.addEventListener("click", () => {
+        showMain();
+        switchToReportsMode();
+    });
+}
+
+// اختيار مرحلة (يعمل حسب الوضع الحالي: بيانات / تقارير)
 levelButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         if (currentMode === "data") {
@@ -445,27 +528,33 @@ levelButtons.forEach(btn => {
     });
 });
 
-reloadBtn.addEventListener("click", () => {
-    if (!currentLevelKey) {
-        tableSubtitleEl.textContent =
-            currentMode === "data"
-                ? "اختر مرحلة أولاً ثم اضغط تحديث."
-                : "اختر مرحلة أولاً ثم اضغط تحديث التقارير.";
-        return;
-    }
+// زر التحديث
+if (reloadBtn) {
+    reloadBtn.addEventListener("click", () => {
+        if (!currentLevelKey) {
+            tableSubtitleEl.textContent =
+                currentMode === "data"
+                    ? "اختر مرحلة أولاً ثم اضغط تحديث."
+                    : "اختر مرحلة أولاً ثم اضغط تحديث التقارير.";
+            return;
+        }
 
-    if (currentMode === "data") {
-        loadLevel(currentLevelKey);
-    } else {
-        loadReports(currentLevelKey);
-    }
-});
+        if (currentMode === "data") {
+            loadLevel(currentLevelKey);
+        } else {
+            loadReports(currentLevelKey);
+        }
+    });
+}
 
-searchInputEl.addEventListener("input", () => {
-    if (currentMode === "data") {
-        if (!currentAllRows) return;
-        renderTable(currentAllRows, searchInputEl.value);
-    } else if (currentMode === "reports") {
-        renderReports(currentReports, searchInputEl.value);
-    }
-});
+// البحث
+if (searchInputEl) {
+    searchInputEl.addEventListener("input", () => {
+        if (currentMode === "data") {
+            if (!currentAllRows) return;
+            renderTable(currentAllRows, searchInputEl.value);
+        } else if (currentMode === "reports") {
+            renderReports(currentReports, searchInputEl.value);
+        }
+    });
+}

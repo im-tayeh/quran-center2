@@ -318,6 +318,18 @@ body {
     transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
 }
 
+a.menu-btn {
+    text-decoration: none;
+}
+
+.menu-section-main {
+    justify-content: space-between;
+}
+
+.menu-buttons-main {
+    gap: 8px;
+}
+
 .menu-btn .icon {
     font-size: 16px;
 }
@@ -567,4 +579,53 @@ tbody tr:hover {
     table {
         min-width: 640px;
     }
+}
+
+.reports-list {
+    max-height: calc(100vh - 260px);
+    overflow: auto;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.report-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(15,23,42,0.9);
+    border: 1px solid rgba(30,64,175,0.7);
+    font-size: 14px;
+}
+
+.report-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.report-name {
+    font-weight: 500;
+}
+
+.report-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.report-download-btn {
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(148,163,184,0.7);
+    background: rgba(15,23,42,0.9);
+    color: var(--text-main);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.report-download-btn:hover {
+    border-color: rgba(34,211,238,0.9);
 }

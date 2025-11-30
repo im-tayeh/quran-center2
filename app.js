@@ -465,7 +465,9 @@ async function loadReports(levelKey) {
             throw new Error("تعذر الوصول إلى مجلد التقارير في GitHub.");
         }
 
+        // Log the API response to check for issues
         const items = await response.json();
+        console.log(items); // Add this line to check what is being returned
 
         const pdfFiles = items.filter(
             item => item.type === "file" && item.name.toLowerCase().endsWith(".pdf")
@@ -483,7 +485,6 @@ async function loadReports(levelKey) {
         setErrorState("تعذر تحميل التقارير: " + err.message);
     }
 }
-
 
 // ================== ربط الأحداث ==================
 

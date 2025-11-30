@@ -108,6 +108,7 @@ function switchToReportsMode() {
     mainModeTitleEl.textContent = "التقارير الشهرية";
     levelSectionTitleEl.textContent = "اختر المرحلة الدراسية أو قسم المحفظين لعرض تقاريره";
 
+    // تأكد من إخفاء جدول بيانات الطلاب والمحفظين قبل التبديل
     dataViewEl.classList.add("hidden");
     reportsViewEl.classList.remove("hidden");
 
@@ -132,6 +133,7 @@ function switchToReportsMode() {
     searchInputEl.value = "";
     searchInputEl.placeholder = "بحث باسم التقرير...";
 }
+
 
 // ================== حالة التحميل والأخطاء ==================
 

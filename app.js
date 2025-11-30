@@ -71,7 +71,6 @@ function switchToDataMode() {
     studentsMainBtn.classList.add("active");
     reportsMainBtn.classList.remove("active");
 
-    mainModeTitleEl.textContent = "القائمة الرئيسية";
     levelSectionTitleEl.textContent = "اختر المرحلة الدراسية أو قسم المحفظين لعرض بياناته";
 
     dataViewEl.classList.remove("hidden");

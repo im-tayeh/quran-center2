@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>البوابة الإلكترونية لمركز التحفيظ</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div id="app">
+    <section id="splash" class="splash">
+        <div class="splash-content">
+            <div class="logo-wrapper">
+                <div class="logo-orbit"></div>
+                <img id="centerLogoBig" src="logo.png" alt="شعار المركز">
+            </div>
+
+            <div class="splash-badge">
+                <span>البوابة الإلكترونية لمركز التحفيظ</span>
+            </div>
+
+            <h1 class="splash-title">مركز النعمان بن مقرِّن</h1>
+            <p class="center-subtitle">لتعليم وتحفيظ القرآن والسنة</p>
+
+            <p class="splash-subtitle">
+                بوابة إلكترونية لعرض بيانات الطلاب والمحفظين مباشرة من Google Sheets،
+                لتسهيل عمل الإدارة والمعلمين في المتابعة اليومية.
+            </p>
+
+            <button id="startBtn" class="start-btn">
+                <span class="start-btn-icon">▶</span>
+                <span>ابدأ</span>
+            </button>
+        </div>
+    </section>
+
+    <section id="main" class="hidden">
+        <div class="main-layout">
+
+            <header class="app-header">
+                <div class="app-header-info">
+                    <img id="centerLogoMini" class="app-logo-mini" src="logo.png" alt="شعار المركز">
+                    <div class="app-header-text">
+                        <strong>لوحة بيانات مركز النعمان بن مقرِّن</strong>
+                        <span>عرض مباشر لبيانات الطلاب والمحفظين من Google Sheets</span>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <button class="outline-btn" id="backToSplashBtn">الرجوع للشاشة الافتتاحية</button>
+                </div>
+            </header>
+
+            <div class="menu-card">
+                <div class="menu-section">
+                    <div class="menu-buttons">
+                        <button class="menu-btn active" id="studentsMainBtn">
+                            <span class="icon">👨‍🎓</span>
+                            <span>بيانات الطلاب والمحفظين</span>
+                        </button>
+                    </div>
+                    <div class="menu-title">القائمة الرئيسية</div>
+                </div>
+            </div>
+
+            <div class="menu-card">
+                <div class="menu-title">اختر المرحلة الدراسية أو قسم المحفظين لعرض بياناته</div>
+                <div class="menu-buttons">
+                    <button class="menu-btn level-btn" data-level="primary">
+                        <span class="icon">📘</span>
+                        <span>المرحلة الابتدائية</span>
+                    </button>
+                    <button class="menu-btn level-btn" data-level="prep">
+                        <span class="icon">📗</span>
+                        <span>المرحلة الإعدادية</span>
+                    </button>
+                    <button class="menu-btn level-btn" data-level="secondary">
+                        <span class="icon">📕</span>
+                        <span>المرحلة الثانوية</span>
+                    </button>
+                    <button class="menu-btn level-btn" data-level="teachers">
+                        <span class="icon">👨‍🏫</span>
+                        <span>المحفظون</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-section" id="tableSection">
+                <div class="table-header">
+                    <div class="table-header-title">
+                        <h2 id="tableTitle">اختر مرحلة من الأعلى لعرض بيانات الطلاب أو المحفظين</h2>
+                        <span id="tableSubtitle">
+                            لا يتم حفظ أي بيانات في هذه الصفحة، فقط قراءة مباشرة من Google Sheets.
+                        </span>
+                    </div>
+
+                    <div class="table-header-actions">
+                        <input id="searchInput" class="search-input" type="text" placeholder="بحث باسم الطالب أو الحلقة..." />
+                        <span id="statusPill" class="status-pill">لا يوجد تحميل حالياً</span>
+                        <button id="reloadBtn" class="ghost-small">تحديث البيانات</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-scroll">
+                        <table id="studentsTable">
+                            <thead>
+                                <tr id="tableHeaderRow"></tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <tr>
+                                    <td colspan="10" class="muted-text">لم يتم اختيار مرحلة بعد.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="loadingOverlay" class="loading-overlay hidden">
+                        <div class="spinner"></div>
+                        <div class="muted-text">جاري تحميل البيانات من Google Sheets...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -37,6 +37,7 @@
         </div>
     </section>
 
+        <!-- الواجهة الرئيسية -->
     <section id="main" class="hidden">
         <div class="main-layout">
 
@@ -55,17 +56,25 @@
             </header>
 
             <div class="menu-card">
-                <div class="menu-section">
-                    <div class="menu-buttons">
-                        <button class="menu-btn active" id="studentsMainBtn">
+                <div class="menu-section menu-section-main">
+                    <div class="menu-buttons menu-buttons-main">
+                        <button class="menu-btn main-tab-btn active" id="studentsMainBtn">
                             <span class="icon">👨‍🎓</span>
                             <span>بيانات الطلاب والمحفظين</span>
                         </button>
+                        <button class="menu-btn main-tab-btn" id="reportsMainBtn">
+                            <span class="icon">📄</span>
+                            <span>التقارير</span>
+                        </button>
                     </div>
+                    <div class="menu-title" id="mainModeTitle">القائمة الرئيسية</div>
+                </div>
             </div>
 
             <div class="menu-card">
-                <div class="menu-title">اختر المرحلة الدراسية أو قسم المحفظين لعرض بياناته</div>
+                <div class="menu-title" id="levelSectionTitle">
+                    اختر المرحلة الدراسية أو قسم المحفظين لعرض بياناته
+                </div>
                 <div class="menu-buttons">
                     <button class="menu-btn level-btn" data-level="primary">
                         <span class="icon">📘</span>
@@ -103,7 +112,7 @@
                 </div>
 
                 <div class="table-container">
-                    <div class="table-scroll">
+                    <div id="dataView" class="table-scroll">
                         <table id="studentsTable">
                             <thead>
                                 <tr id="tableHeaderRow"></tr>
@@ -116,15 +125,20 @@
                         </table>
                     </div>
 
+                    <div id="reportsView" class="reports-list hidden">
+                        <!-- التقارير تُعرض هنا ديناميكياً -->
+                    </div>
+
                     <div id="loadingOverlay" class="loading-overlay hidden">
                         <div class="spinner"></div>
-                        <div class="muted-text">جاري تحميل البيانات من Google Sheets...</div>
+                        <div class="muted-text">جاري تحميل البيانات...</div>
                     </div>
                 </div>
             </div>
 
         </div>
     </section>
+
 </div>
 
 <script src="app.js"></script>
